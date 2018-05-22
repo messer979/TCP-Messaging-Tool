@@ -107,7 +107,10 @@ def retrieveHostPort(connections):
 ##############################################################################################################################
 
 
-print("Dev2 Inventory Adjustment")
+print("TCP Messaging Tool")
+print("Dev by CM")
+
+
 
 connections = loadConnections()
 
