@@ -1,9 +1,9 @@
 # TCPy for Manhattan WMOS
-A TCP Communication Tool built in Python3 specifically for Manhattan Associates End Point Testing.
+A TCP Communication Tool built in Python3 specifically for Manhattan Associates MHE messaging.
 
 The program is very user friendly - just follow the prompts.
 
-**If you do not want to install python - simply download the TCPy for Manhattan.exe file. **
+**If you do not want to install python - simply download the TCPy for WMOS.exe file. **
 
 ## Features:
 - Rapidly send messages to the same connection
@@ -12,9 +12,9 @@ The program is very user friendly - just follow the prompts.
 - Specify option to send several lines in a single message
 
 ## Full Manual (Available in program):
-This tool is totally written in Python. The modules used are socket, sys, ctypes, and pickle. Prior to this tool, the commonly used software for sending TCP messages was the TCP Test Tool. This program was lacking for several reasons. This new tool is designed specifically for Manhattan Associates use in order to simplify the job of sending TCP messages to WM. Not only are messages easier to send, but new connections to specific end points can be saved in a separate 'pickle' file. This file is not editable apart from this program and must sit in the same folder as the "TCPy for Manhattan" program.
+This tool is totally written in Python. The modules used are socket, sys, ctypes, and pickle. Prior to this tool, the commonly used software for sending TCP messages was the TCP Test Tool. This program was lacking for several reasons. This new tool is designed specifically for Manhattan Associates use in order to simplify the job of sending TCP messages to WM. Not only are messages easier to send, but new connections to specific end points can be saved in a separate 'pickle' file. This file is not editable apart from this program and must sit in the same folder as the "TCPy for WMOS" program.
 
-There are 4 sub programs in the "TCPy for Manhattan" tool
+There are 4 sub programs in the "TCPy for WMOS" tool
     
    *Add Connections
    *Remove Connections
