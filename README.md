@@ -1,4 +1,4 @@
-# TCPy for Manhattan
+# TCPy for Manhattan WMOS
 A TCP Communication Tool built in Python3 specifically for Manhattan Associates End Point Testing.
 
 The program is very user friendly - just follow the prompts.
