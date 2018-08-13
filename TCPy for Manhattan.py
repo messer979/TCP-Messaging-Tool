@@ -10,6 +10,7 @@ def loadConnections():
     "example:'DEV containerstatus'" : 	['localhost',1521],
     }
 
+
     while True:
         try:
             savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
@@ -311,9 +312,11 @@ while True:
         environment = HostPort[2]
         print("\nConnection Name: " + environment)
         print("Connection Detail: " + hostname + ":" + str(port))
+        print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
     elif prompt =='2':
         print("\nConnection Name: " + environment)
         print("Connection Detail: " + hostname + ":" + str(port))
+        print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
     elif prompt =='3':
         printManual()
     elif prompt == '4':
