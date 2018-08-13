@@ -1,9 +1,6 @@
 # TCPy for Manhattan
 A TCP Communication Tool built in Python3 specifically for Manhattan Associates End Point Testing.
 
-Required:
-  Python 3
-
 The program is very user friendly - just follow the prompts.
 
 Features:
@@ -11,6 +8,7 @@ Rapidly send messages to the same connection
 Create and save connections
 
 Full Manual (Available in program):
+This tool is totally written in Python. The modules used are socket, sys, ctypes, and pickle. Prior to this tool, the commonly used software for sending TCP messages was the TCP Test Tool. This program was lacking for several reasons. This new tool is designed specifically for Manhattan Associates use in order to simplify the job of sending TCP messages to WM. Not only are messages easier to send, but new connections to specific end points can be saved in a separate 'pickle' file. This file is not editable apart from this program and must sit in the same folder as the "TCPy for Manhattan" program.
 
 There are 4 sub programs in the "TCPy for Manhattan" tool
     
