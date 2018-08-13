@@ -1,5 +1,5 @@
-# TCP-Messaging-Tool
-A TCP Communication Tool built in Python3
+# TCPy for Manhattan
+A TCP Communication Tool built in Python3 specifically for Manhattan Associates End Point Testing.
 
 Required:
   Python 3
