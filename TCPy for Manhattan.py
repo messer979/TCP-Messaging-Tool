@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import socket, sys, ctypes
+import socket, sys, ctypes, pickle
 ctypes.windll.kernel32.SetConsoleTitleW("Manhattan TCPy") #changes window name
 
 
@@ -10,7 +10,6 @@ def loadConnections():
     "example:'DEV containerstatus'" : 	['localhost',1521],
     }
 
-    import pickle
     while True:
         try:
             savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
@@ -38,7 +37,6 @@ def loadConnections():
 
 ################################################################################################################################################################
 def addConnection():
-    import pickle
     done = ""
     while done.upper() != "N":
         newName = input("Enter new environment and connection name: ")
@@ -64,7 +62,6 @@ def addConnection():
 ################################################################################################################################################################
 
 def removeConnection():
-    import pickle
     savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
 
     optionsDictionary = {}
@@ -96,8 +93,6 @@ def removeConnection():
 
 ################################################################################################################################################################
 def renameConnection():
-
-    import pickle
     savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
 
     optionsDictionary = {}
