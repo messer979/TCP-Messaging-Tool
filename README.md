@@ -33,4 +33,9 @@ On the connection selection screen, a user can enter r or remove in order to rem
 On the connection selection screen, a user can enter rn or rename in order to rename a connection.
 
 -Send Messages
-Upon selecting a connection, users are presented with a prompt to send messages. Users can send messages freely to the connection. The hexcode values should not be entered with the MHE message. As this is designed specifically for Manhattan Associates use, the x02 and x03 values are automatically appended to all messages. Furthermore, a connection is opened and closed to the host each time the message is sent. Therefore, users do not need to worry about maintaining the connection.
+Upon selecting a connection, users are presented with a prompt to send messages. Users can send messages freely to the connection. The hexcode values should not be entered with the MHE message. As this is designed specifically for Manhattan Associates use, the x02 and x03 values are automatically appended to all messages. Furthermore, a connection is opened and closed to the host each time the message is sent. Therefore, users do not need to worry about maintaining the connection. 
+
+-- A validation exists to verify the message has at least one '^' character within it in order to prevent the accidental sending of data. If a client has an MHE format which excludes the '^', this validation must be removed from the code manually. 
+
+- Send multi-line messages
+After the send message prompt is displayed, users may enter 'm' in order to send a multi-line message. Each line from the message is entered one at a time. (You can copy however many lines you want and paste them simultaneously to do this rapidly.) The message is then compiled so that each line is separated by a return (\n) and the message is sent with the hex values.
