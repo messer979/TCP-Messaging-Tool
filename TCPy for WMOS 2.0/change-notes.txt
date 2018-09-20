@@ -1,0 +1,3 @@
+Program modified to use json instead of pickle module. 
+
+In the json, user is now able to manually edit connections, start/end message, and validator.
