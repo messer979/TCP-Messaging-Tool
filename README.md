@@ -3,7 +3,9 @@ A TCP Communication Tool built in Python3 specifically for Manhattan Associates 
 
 The program is very user friendly - just follow the prompts.
 
-**If you do not want to install python - simply download the TCPy for WMOS.exe file. **
+**If you do not want to install python - simply download the TCPy for WMOS.exe file.**
+
+**Recommend using version two from now on. Please open issues if error with version two is encountered. It has not been tested much.**
 
 ## Features:
 - Rapidly send messages to the same connection
