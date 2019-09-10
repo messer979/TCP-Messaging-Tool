@@ -1,25 +1,39 @@
 #!/usr/bin/env python
 
-import socket, sys, ctypes, pickle
+import socket, sys, ctypes
 ctypes.windll.kernel32.SetConsoleTitleW("TCPy for WMOS") #changes window name
+import json
 
 
-def loadConnections():
-    connections ={
-    
-    "example:'DEV containerstatus'" : 	['localhost',1521],
+def loadConfiguration(): 
+
+    baseConfig={
+        "config": {
+            "Message Start": "\x02",
+            "Message End": "\x03",
+            "Validator": "^"
+        },
+        "connections": {
+            "example: DEVcontainerstatus": ["localhost",
+            "1521"]
+        }
     }
 
 
     while True:
         try:
-            savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
-            break
-        except FileNotFoundError:
-            print("No prior connections found. Would you like to create a new file?")
+            with open("TCPy_cnf.json","r") as j:
+                cnf = json.load(j)
+                break
+        except:
+            print("Valid file not found. Would you like to create a new file?")
             createNew = input("y/n? ")
             if createNew.upper() == "Y":
-                savedConnections = "create"
+                with open("TCPy_cnf.json","w") as j:
+                    json.dump(baseConfig,j)
+                with open("TCPy_cnf.json","r") as j:
+                    cnf = json.load(j)
+                    break
                 break
             elif createNew.upper() == "N":
                 "No valid connections"
@@ -27,24 +41,18 @@ def loadConnections():
             else:
                 print("Invalid Response")
 
-        
-    if savedConnections == "create":
-        pickle.dump(connections,open("TCPconnectionslist.p","wb"))
-        connections = pickle.load(open("TCPconnectionslist.p","rb"))
-    else:
-        connections = pickle.load(open("TCPconnectionslist.p","rb"))
-    
-    return connections
+    return cnf
+
+
+
+
+
 
 ################################################################################################################################################################
 def addConnection():
     done = ""
     while done.upper() != "N":
         newName = input("Enter new environment and connection name: ")
-            # I think this isn't necessary since users must select a number option which is dynamically assigned.
-            # if newName.upper == "N" or newName.upper == "R" or newName.upper == "NEW" or newName.upper == "REMOVE": 
-                # print("Name not allowed")
-                # continue
                 
         newHost = input("Enter hostname: ")
         while True:
@@ -54,28 +62,27 @@ def addConnection():
             except ValueError:
                 print("Please enter a number.")
                 continue
-        savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
-        savedConnections[newName] = [newHost,newPort]
-        pickle.dump(savedConnections,open("TCPconnectionslist.p","wb"))
-        done = input("Add Another? \n y/n: ")
-    return savedConnections
 
+        connections[newName] = [newHost,newPort]
+        done = input("Add Another? \n y/n: ")
+
+        saveJSON(confFile['config'],connections)
+    return
 ################################################################################################################################################################
 
 def removeConnection():
-    savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
 
     optionsDictionary = {}
     optionsList = []
 
     #create menu so user can enter numbers 
-    for key in savedConnections.keys():
+    for key in connections.keys():
         optionsList.append(key)
 
     # keep list sorted
     optionsList = sorted(optionsList)
     
-    for i in range(len(list(savedConnections.keys()))):
+    for i in range(len(list(connections.keys()))):
         optionsDictionary[i+1] = optionsList[i]
     
     print("Type 0 when finished.")
@@ -86,27 +93,27 @@ def removeConnection():
             print("Please enter a number.")
             continue
         if rm == 0:
-            return savedConnections
+            saveJSON(confFile['config'],connections)
+            break
         else:
             rmstr = optionsDictionary.get(rm)
-            del savedConnections[rmstr]
-            pickle.dump(savedConnections,open("TCPconnectionslist.p","wb"))
+            del connections[rmstr]
+            saveJSON(confFile['config'],connections)
 
 ################################################################################################################################################################
 def renameConnection():
-    savedConnections = pickle.load(open( "TCPconnectionslist.p", "rb" ))
 
     optionsDictionary = {}
     optionsList = []
 
     #create menu so user can enter numbers 
-    for key in savedConnections.keys():
+    for key in connections.keys():
         optionsList.append(key)
         
     # keep list sorted
     optionsList = sorted(optionsList)
 
-    for i in range(len(list(savedConnections.keys()))):
+    for i in range(len(list(connections.keys()))):
         optionsDictionary[i+1] = optionsList[i]
     
     print("Type 0 when finished.")
@@ -118,35 +125,95 @@ def renameConnection():
             print("Please enter a valid number. 0 to quit.")
             continue
         if rn == 0:
-            return savedConnections
+            return connections
         else:
             if rnstr == None:
                 print("Please enter a valid number. 0 to quit.")
                 continue
             newName = input("Enter new name: ")
-            rninfo = savedConnections[rnstr]
-            del savedConnections[rnstr]
-            savedConnections[newName] = rninfo
-            pickle.dump(savedConnections,open("TCPconnectionslist.p","wb"))
-            print (str(newName)+ ":" + str(savedConnections[newName]) + " is the new entry.")
+            rninfo = connections[rnstr]
+            del connections[rnstr]
+            connections[newName] = rninfo
+            saveJSON(confFile['config'],connections)
+            print (str(newName)+ ":" + str(connections[newName]) + " is the new entry.")
+
+
+################################################################################################################################################################
+def viewConfig(): # THIS NEEDS WORK PRIOR TO ALLOWING USERS TO EDIT - UNABLE TO APPEND THE '\' TO A DICTIONARY ENTRY
+
+    confFile = loadConfiguration()
+
+    optionsDictionary = {}
+    optionsList = []
+
+    newConfig = confFile['config']
+    print(newConfig)
+    
+
+    for key,val in newConfig.items():
+        optionsList.append(key +": "+ repr(val))
+
+
+    for i in range(len(list(newConfig.keys()))):
+        optionsDictionary[i+1] = optionsList[i]
+
+    # print("\nSelect configuration to change: ")
+    print("\nCurrent Configuration")
+    for num, config in sorted(optionsDictionary.items()):
+        print(str(num) + ". "+config)
+
+    input("\nTo modify this config, please edit the TCP_cnf.json file via text editor.\nEnter when finished")
+    # print("Enter 0 when finished.")
+    # while True: 
+    #     try:
+    #         cnChg = int(input("Which configuration to change? "))
+    #         if cnChg == 1:
+    #             newMessStart = input("Enter a new message start. Hex values should be in format 'x00':\n")
+    #             newConfig["Message Start"] = newMessStart
+    #         elif cnChg == 2:
+    #             newMessEnd = input("Enter a new message end. Hex values should be in format 'x00':\n")
+    #             newMessEnd = "\\" + newMessEnd 
+    #             newConfig["Message End"] = newMessEnd.encode()
+    #         elif cnChg == 3:
+    #             newValidator = input("Enter a validation character (e.g. ^)\n")
+    #             newConfig["Validator"] = newValidator
+    #         else:
+    #             break
+    #     except ValueError:
+    #         "Invalid Entry"
+    #         continue
+    # saveJSON(newConfig,confFile['connections'])
 
 
 
 ################################################################################################################################################################
+def saveJSON(newConfig,newConnections):
+    newJSON = {'config':newConfig, 'connections':newConnections} 
+    with open("TCPy_cnf.json","w") as j:
+        json.dump(newJSON,j)
+
+################################################################################################################################################################
 def SendTCP(userInput, hostname, port):
-    MESSAGE ="\x02" + userInput + "\x03"
-    if "^" not in userInput :
+    MESSAGE = message_start + userInput + message_end
+    if validator == None:
+        True ==True 
+    elif validator not in userInput:
         print("Probable Invalid Format\n")
         return
     
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        s.connect((hostname, port))
-        s.sendto(MESSAGE.encode(),(hostname, port))
+        s.connect((hostname, int(port)))
+        s.sendto(MESSAGE.encode(),(hostname, int(port)))
+        print(s.recv(2048).decode())
+    
         s.close()
         print ("Success.\n")
     except ConnectionRefusedError:
         print("Connection Refused - check end point config")
+    except:
+        print("Unexpected error - verify connection info")
+
         
     
 
@@ -156,7 +223,7 @@ def SendTCP(userInput, hostname, port):
 def MultiLineMessage(prompt, hostname, port):
     
     
-    print("Multi-Line Messaging. Input 'f' when finished with a message.\nType 'end' to return to single entry mode.")
+    print("Multi-Line Messaging.\n After inserting each message line, type 'f' for the final line when finished with a message.\n Type 'end' to return to single entry mode.")
     while prompt != 'end':
         promptList = []
         lineCounter = 1
@@ -173,8 +240,8 @@ def MultiLineMessage(prompt, hostname, port):
             userInput = '\n'.join(promptList)
 
 
-            MESSAGE ="\x02" + userInput + "\x03" ##testing
-            print(MESSAGE)                ##testing            
+            MESSAGE = message_start + userInput + message_end
+            print(MESSAGE)                  
 
             SendTCP(userInput, hostname, port)
             continue
@@ -204,10 +271,10 @@ def retrieveHostPort(connections):    #obtains the specific host from the dictio
 
         selection = input("\nChoice: ")
         if selection.upper() == "NEW" or selection.upper() == "N":
-            connections = addConnection()
+            addConnection()
             continue
         elif selection.upper() == "REMOVE" or selection.upper() == "R":
-            connections = removeConnection()
+            removeConnection()
             continue
         elif selection.upper() == "RENAME" or selection.upper() == "RN":
             connections = renameConnection()
@@ -235,7 +302,7 @@ def printManual():
     
     
     print('\nDescription of Tool and Purpose')
-    print('''\nThis tool is totally written in Python. The modules used are socket, sys, ctypes, and pickle. Prior to this tool, the commonly used software for sending TCP messages was the TCP Test Tool. This program was lacking for several reasons. This new tool is designed specifically for Manhattan Associates use in order to simplify the job of sending TCP messages to WM. Not only are messages easier to send, but new connections to specific end points can be saved in a separate 'pickle' file. This file is not editable apart from this program and must sit in the same folder as the "TCPy for Manhattan" program.
+    print('''\nThis tool is totally written in Python. The modules used are socket, sys, ctypes, and json. Prior to this tool, the commonly used software for sending TCP messages was the TCP Test Tool. This program was lacking for several reasons. This new tool is designed specifically for Manhattan Associates use in order to simplify the job of sending TCP messages to WM. Not only are messages easier to send, but new connections to specific end points can be saved in a separate json file. This file must sit in the same folder as the "TCPy for Manhattan" program.
     ''')
     
     print('\nGeneral Usage')
@@ -248,7 +315,7 @@ def printManual():
    *Send multi-line message
    \n
 -Add Connections 
-Upon logging in for the first time. Users are prompted to create a new pickle file in order to create a persistent dictionary of all connections. Once the pickle file is created, users will be able to create new connections. Upon typing n or new during the first screen prompt, a user is prompted for a name, host and port. It is recommended that a connection is named based on the end point it references. Each connection is combination of a host and a port. When the connections are presented to the user, they are dynamically assigned a number in alphabetical order in order to simplify the selection process.
+Upon logging in for the first time. Users are prompted to create a new json file in order to hold the configuration for the instance of the program. Once the file is created, users will be able to create new connections. Upon typing n or new during the first screen prompt, a user is prompted for a name, host and port. It is recommended that a connection is named based on the end point it references. Each connection is combination of a host and a port. When the connections are presented to the user, they are dynamically assigned a number in alphabetical order in order to simplify the selection process.
 
 
 -Remove Connections
@@ -265,65 +332,94 @@ Upon selecting a connection, users are presented with a prompt to send messages.
     # return
 
 
-print("TCPy for WMOS")
+print("\nTCPy for WMOS")
 print("Dev by CMesser")
 
-print("\nType 'm' to see manual. Else hit enter to start program.")
+
+while True:
+    print("\nConfiguration file loading...")
+    confFile = loadConfiguration()
+    try:
+        message_start = confFile['config']['Message Start']
+        message_end = confFile['config']['Message End']
+        validator = confFile['config']['Validator']
+        connections = confFile['connections']
+        break
+    except:
+        q = input("Error found in config file. Reset to defaults?")
+        if q.upper() == 'Y' or q.upper()=='YES':
+            with open("TCPy_cnf.json","w") as j:
+                True
+            continue
+        else:
+            input("Please fix manually - program will discontinue until resolved.")
+            exit()
+    break
+print("\nType 'm' to see manual. Type 'c' to view TCPy configuration.")
 selection = input("Choice: ")
 
 if selection == 'm':
     printManual()
     input("Enter to continue")
+elif selection == 'c':
+    viewConfig()
+
 
     
-    
-
-
-
-connections = loadConnections()
-
-HostPort = retrieveHostPort(connections)    
-
-if HostPort == None:
-    print("Failed to get connection info.")
-    print ("Try again?")
-    response = input("y/n?")
-    if response.upper() == 'Y':
-        HostPort = retrieveHostPort(connections)
-    else:
-        sys.exit()
-
-hostname = HostPort[0]
-port = HostPort[1]
-environment = HostPort[2]
-print("\nConnection Name: " + environment)
-print("Connection Detail: " + hostname + ":" + str(port))
-
-    
-print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
-
 while True:
-    prompt=input("Enter Message: \n")
-    if prompt == '1':
-        connections = loadConnections()
-        HostPort = retrieveHostPort(connections)
-        hostname = HostPort[0]
-        port = HostPort[1]
-        environment = HostPort[2]
-        print("\nConnection Name: " + environment)
-        print("Connection Detail: " + hostname + ":" + str(port))
-        print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
-    elif prompt =='2':
-        print("\nConnection Name: " + environment)
-        print("Connection Detail: " + hostname + ":" + str(port))
-        print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
-    elif prompt =='3':
-        printManual()
-    elif prompt == '4':
-        input("Thank you for using this tool.")
-        break
-    elif prompt =='m':
-        MultiLineMessage(prompt,hostname,port)
-        print("Returning to single line entry..")
-    else:
-        SendTCP(prompt, hostname, port)
+    confFile = loadConfiguration()
+
+    #adding config to global variables
+    try:
+        message_start = confFile['config']['Message Start']
+        message_end = confFile['config']['Message End']
+        validator = confFile['config']['Validator']
+        connections = confFile['connections']
+    except:
+        q = input("Error found in config file. Reset to defaults?")
+        if q.upper() == 'Y' or q.upper()=='YES':
+            with open("TCPy_cnf.json","w") as j:
+                True
+            continue
+        else:
+            input("Please fix manually - program will discontinue until resolved.")
+            exit()
+
+
+    HostPort = retrieveHostPort(connections)    
+
+    if HostPort == None:
+        print("Failed to get connection info.")
+        print ("Try again?")
+        response = input("y/n?")
+        if response.upper() == 'Y':
+            HostPort = retrieveHostPort(connections)
+        else:
+            sys.exit()
+
+    hostname = HostPort[0]
+    port = HostPort[1]
+    environment = HostPort[2]
+    print("\nConnection Name: " + environment)
+    print("Connection Detail: " + hostname + ":" + str(port))
+        
+    print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
+
+    while True:
+        prompt=input("Enter Message: \n")
+        if prompt == '1':
+            break
+        elif prompt =='2':
+            print("\nConnection Name: " + environment)
+            print("Connection Detail: " + hostname + ":" + str(port))
+            print("\nOptions:\n  Send messages freely. \n  Type 'm' to send a message with multiple lines. \n  Type 1 for another environment. \n  Type 2 to see environment details again.\n  Type 3 to see the manual.\n  Type 4 to quit.\n") #menu 2
+        elif prompt =='3':
+            printManual()
+        elif prompt == '4':
+            input("Thank you for using this tool.")
+            exit()
+        elif prompt =='m':
+            MultiLineMessage(prompt,hostname,port)
+            print("Returning to single line entry..")
+        else:
+            SendTCP(prompt, hostname, port)
